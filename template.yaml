@@ -13,3 +13,6 @@ Resources:
         - x86_64
       MemorySize: 128
       Timeout: 100
+      Policies:
+        - S3WritePolicy:
+            BucketName: show-ratings-scraper-output
