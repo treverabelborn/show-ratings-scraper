@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import TypedDict, Optional
 from enum import Enum
 
 
@@ -12,7 +12,8 @@ class Platform(Enum):
 
 class TvShow(TypedDict):
     title: str
-    thumbnail_url: str
+    thumbnail_url: Optional[str]
+    trailer_url: str
     # platform: Platform
     critic_rating: int
     audience_rating: int

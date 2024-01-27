@@ -20,7 +20,7 @@ sam local start-lambda
 Then in another terminal:
 
 ```bash
-sam local invoke HelloWorldFunction
+sam local invoke ShowRatingsScraperFunction
 ```
 
 ## Deploying
