@@ -1,21 +1,16 @@
-import requests
-from bs4 import BeautifulSoup
 import io
 import csv
 import boto3
 from .models import TvShow
-from .scrapers import scrape_all_shows
+from .scrapers import scrape_rotten_tomatoes
 
-SRC_URL = 'https://www.rottentomatoes.com/browse/tv_series_browse/affiliates:netflix~sort:popular?page=5'
+
 OUTPUT_BUCKET = 'show-ratings-scraper-output'
 OUTPUT_NAME = 'test_run.csv'
 
 
 def lambda_handler(event, context):
-    page = requests.get(SRC_URL)
-    soup = BeautifulSoup(page.content, 'html.parser')
-
-    scraped_shows: list[TvShow] = scrape_all_shows(soup)
+    scraped_shows: list[TvShow] = scrape_rotten_tomatoes()
     shows_fields = list(scraped_shows[0].keys())
 
     output_stream = io.StringIO()

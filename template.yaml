@@ -1,8 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
+Description: |
   show-ratings-scraper
-
 Resources:
   ShowRatingsScraperFunction:
     Type: AWS::Serverless::Function
@@ -16,3 +15,37 @@ Resources:
       Policies:
         - S3WritePolicy:
             BucketName: show-ratings-scraper-output
+    Metadata:
+      SamResourceId: ShowRatingsScraperFunction
+  Schedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      ScheduleExpression: rate(1 day)
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Arn: !GetAtt ShowRatingsScraperFunction.Arn
+        RoleArn: !GetAtt ScheduleToShowRatingsScraperFunctionRole.Arn
+  ScheduleToShowRatingsScraperFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: !Sub scheduler.${AWS::URLSuffix}
+          Action: sts:AssumeRole
+          Condition:
+            ArnLike:
+              aws:SourceArn: !Sub
+                - arn:${AWS::Partition}:scheduler:${AWS::Region}:${AWS::AccountId}:schedule/*/${AWS::StackName}-${ResourceId}-*
+                - ResourceId: Schedule
+      Policies:
+        - PolicyName: StartExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt ShowRatingsScraperFunction.Arn
